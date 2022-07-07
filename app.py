@@ -26,7 +26,7 @@ app = Flask(__name__)
 # Add Potgres Database
 
 
-bank_balances_uri = 'postgres://pmexsbdwmokrmy:a6568409da913377486746382a52d559b42de43bceb574644d56a9b3855d2d9f@ec2-54-159-22-90.compute-1.amazonaws.com:5432/ddo72dnumoua06'
+bank_balances_uri = 'postgresql://pmexsbdwmokrmy:a6568409da913377486746382a52d559b42de43bceb574644d56a9b3855d2d9f@ec2-54-159-22-90.compute-1.amazonaws.com:5432/ddo72dnumoua06'
 #bank_balances_uri = 'postgresql://pavel:1234@localhost/bank_balances'
 #banks_uri = 'postgresql://pavel:1234@localhost/banks'
 #balances_uri = 'postgresql://pavel:1234@localhost/balances'
