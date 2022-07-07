@@ -1,0 +1,112 @@
+{% extends 'base.html' %}
+
+
+{% block content %}
+
+	<h4>Filters</h4>
+
+<div class="shadow p-3 mb-5 bg-body rounded">
+<form method='POST'>
+	{{  form.hidden_tag() }}
+<div class="row">
+
+	<div class="col-3 text-center">
+	{{ form.date(class="form-control") }}
+	</div>
+	<div class="col-3 text-center">
+	{{ form.company_name(class="selectpicker", placeholder='Company Name') }}
+	</div>
+	<div class="col-3 text-left">
+	{{ form.currency(class="selectpicker", placeholder='Currency') }}
+	</div>
+	<div class="col-1 text-right">
+	{{ form.submit(class="btn btn-secondary") }}
+</div>
+<div class="col-2 text-right">
+<button type="button" class="btn btn-secondary " id="export_button">Download</button>
+</div>
+</div>
+</form>
+</div>
+
+<br/>
+
+<h1 class="display-6" align="center">
+	{% if sum_bal == None %}
+	<b>Please fill out the Balances Form for {{ date }}</b>
+	{% else %}
+	<b>As at {{ date }} you have ${{ sum_bal }} cash at Bank</b></h1>
+	{% endif %}
+<br/><br/>
+  <div class='row'>
+	<div id='linebalance'></div>
+		<script>
+			var graphs = {{ graph|safe }};
+			Plotly.plot('linebalance', graphs, {});
+		</script>
+</div>
+
+<div class='row'>
+		<div class='col-8'>
+		<div id='stackCompany'></div>
+			<script>
+				var graphs3 = {{ graph3|safe }};
+				Plotly.plot('stackCompany', graphs3, {});
+			</script>
+	</div>
+	<div class='col-4'>
+		<div id='piecurrency'></div>
+			<script>
+				var graphs2 = {{ graph2|safe }};
+				Plotly.plot('piecurrency', graphs2, {});
+			</script>
+	</div>
+</div>
+<div>
+	<table class="table table-hover table-bordered table-striped" id="balance">
+		<thead class="table-success">
+	  	<tr>
+	  <td><h6>Date</h6></td> 
+		<td><h6>Company name</h6></td> 
+		<td><h6>Bank name</h6></td>
+		<td><h6>Currency</h6></td> 
+		<td><h6>Balance, USD</h6></td>
+		</tr>
+		</thead>
+		{% for our_balance in our_balances %}
+		<tr>
+		<td>{{ our_balance.date }}</td> 
+		<td>{{ our_balance.company_name }}</td> 
+		<td>{{ our_balance.bank_name }}</td>
+		<td>{{ our_balance.currency }}</td> 
+		<td align="right">{{ our_balance.balance_usd | FormatDecimal }}</td>
+		</tr>
+
+		{% endfor %}
+	</table>
+</div>
+
+<script>
+
+function html_table_to_excel(type)
+    {
+        var data = document.getElementById('balance');
+
+        var file = XLSX.utils.table_to_book(data, {sheet: "sheet1"});
+
+        XLSX.write(file, { bookType: type, bookSST: true, type: 'base64' });
+
+        XLSX.writeFile(file, 'cash_balances.' + type);
+    }
+
+    const export_button = document.getElementById('export_button');
+
+    export_button.addEventListener('click', () =>  {
+        html_table_to_excel('xlsx');
+    });
+
+</script>
+
+
+
+{% endblock %}

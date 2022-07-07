@@ -1,0 +1,35 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<h1>Update Bank Information</h1>
+<br/>
+<div class="shadow p-3 mb-5 bg-body rounded">
+<form action='/update/{{ bank_to_update.id }}' method='POST'>
+	{{  form.hidden_tag() }}
+
+	{{ form.company_name.label(class="form-label") }}
+	{{ form.company_name(class="form-control", value=bank_to_update.company_name) }}
+	<br/>
+	{{ form.bank_name.label(class="form-label") }}
+	{{ form.bank_name(class="form-control", value=bank_to_update.bank_name) }}
+	<br/>
+	{{ form.account_number.label(class="form-label") }}
+	{{ form.account_number(class="form-control", value=bank_to_update.account_number) }}
+	<br/>
+	{{ form.currency.label(class="form-label") }}
+	{{ form.currency(class="form-control", value=bank_to_update.currency) }}
+	<br/>
+	{{ form.address.label(class="form-label") }}
+	{{ form.address(class="form-control", value=bank_to_update.address) }}
+	<br/>
+	{{ form.submit(class="btn btn-secondary") }}
+	<a href="{{ url_for('delete', id=id)}}" class="btn btn-danger">Delete</a>
+</form>
+</div>
+
+<br/>
+<br/>
+<br/>
+
+{% endblock %}

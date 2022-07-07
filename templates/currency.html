@@ -1,0 +1,46 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<a class="btn btn-secondary" href="{{ url_for('company') }}" role="button">Set up company</a>
+<a class="btn btn-secondary" href="{{ url_for('currency') }}" role="button">Set up currency</a>
+<br/>
+<br/>
+
+<h1>What currencies are there in the group</h1>
+<br/>
+<div class="shadow p-3 mb-5 bg-body rounded">
+<form method='POST'>
+	{{ form.hidden_tag() }}
+	{{ form.currency.label(class="form-label") }}
+	{{ form.currency(class="form-control") }}
+	<br/>
+
+	{{ form.submit(class="btn btn-secondary") }}	
+
+</form>
+</div>
+
+<br/><br/><br/>
+<table class="table table-hover table-bordered table-striped">
+	<thead class="table-success">
+  	<tr>
+	<td><h6>id</h6></td>
+	<td><h6>Currency</h6></td> 
+	<td><h6>Delete row</h6></td>
+	</tr>
+	</thead>
+{% for our_currency in our_currencies %}
+	<tr>
+	<td>{{ our_currency.id }}</td>
+	<td>{{ our_currency.currency }}</td> 
+	<td><a href="{{ url_for('currency_del', id=our_currency.id)}}">Delete</a></td>
+	</tr>
+
+{% endfor %}
+</table>
+<br/><br/><br/>
+
+
+
+
+{% endblock %}

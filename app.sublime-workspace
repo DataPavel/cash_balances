@@ -1,0 +1,246 @@
+{
+	"auto_complete":
+	{
+		"selected_items":
+		[
+			[
+				"re",
+				"render_template"
+			],
+			[
+				"bank",
+				"banks_uri"
+			],
+			[
+				"company",
+				"company_choices"
+			],
+			[
+				"company_",
+				"company_choices"
+			],
+			[
+				"SQLALCHEMY_",
+				"SQLALCHEMY_DATABASE_URI"
+			],
+			[
+				"Bala",
+				"BalanceForm"
+			],
+			[
+				"Ba",
+				"Banks"
+			],
+			[
+				"fa",
+				"favorite_color"
+			],
+			[
+				"favorite",
+				"favorite_color"
+			],
+			[
+				"nam",
+				"name_to_update"
+			],
+			[
+				"font",
+				"font-size"
+			],
+			[
+				"__",
+				"__name__"
+			]
+		]
+	},
+	"buffers":
+	[
+	],
+	"build_system": "",
+	"build_system_choices":
+	[
+	],
+	"build_varint": "",
+	"command_palette":
+	{
+		"height": 0.0,
+		"last_filter": "",
+		"selected_items":
+		[
+		],
+		"width": 0.0
+	},
+	"console":
+	{
+		"height": 0.0,
+		"history":
+		[
+		]
+	},
+	"distraction_free":
+	{
+		"menu_visible": true,
+		"show_minimap": false,
+		"show_open_files": false,
+		"show_tabs": false,
+		"side_bar_visible": false,
+		"status_bar_visible": false
+	},
+	"file_history":
+	[
+		"/D/Projects/cash balances/group_balances/app.py",
+		"/D/Projects/cash balances/group_balances/templates/index.html",
+		"/D/Projects/cash balances/group_balances/templates/banks.html",
+		"/D/Projects/cash balances/group_balances/queries.py",
+		"/D/Projects/cash balances/group_balances/models.py",
+		"/D/Projects/cash balances/group_balances/templates/currency.html",
+		"/D/Projects/cash balances/group_balances/test.py",
+		"/D/Projects/cash balances/group_balances/templates/company.html",
+		"/D/Projects/cash balances/group_balances/plots.py",
+		"/D/Projects/cash balances/group_balances/templates/initial.html",
+		"/D/Projects/cash balances/group_balances/templates/navbar.html",
+		"/D/Projects/cash balances/group_balances/new_database.py",
+		"/D/Projects/cash balances/group_balances/.gitignore",
+		"/D/Projects/cash balances/group_balances/templates/update.html",
+		"/D/Projects/cash balances/group_balances/templates/balances.html",
+		"/D/Projects/cash balances/group_balances/templates/base.html",
+		"/D/Projects/cash balances/group_balances/index.sublime-project",
+		"/D/Projects/Flask/Codemy/templates/name.html",
+		"/D/Projects/Flask/Codemy/hello.py",
+		"/D/Projects/Flask/Codemy/templates/update.html",
+		"/D/Projects/Flask/Codemy/create_db.py",
+		"/D/Projects/Flask/Codemy/templates/add_user.html",
+		"/D/Projects/Flask/Codemy/templates/index.html",
+		"/D/Projects/Flask/Codemy/templates/user.html",
+		"/D/Projects/Flask/Codemy/templates/500.html",
+		"/D/Projects/Flask/Codemy/templates/404.html",
+		"/D/Projects/Flask/Codemy/templates/navbar.html",
+		"/D/Projects/Flask/Codemy/templates/base.html",
+		"/D/Projects/Flask/Codemy/static/css/style.css",
+		"/D/Projects/Flask/Codemy/static/js/myfile.js",
+		"/D/Projects/Flask/Codemy/static/images/photo.jpg",
+		"/D/Projects/Flask/Codemy/.gitignore"
+	],
+	"find":
+	{
+		"height": 0.0
+	},
+	"find_in_files":
+	{
+		"height": 0.0,
+		"where_history":
+		[
+		]
+	},
+	"find_state":
+	{
+		"case_sensitive": false,
+		"find_history":
+		[
+		],
+		"highlight": true,
+		"in_selection": false,
+		"preserve_case": false,
+		"regex": false,
+		"replace_history":
+		[
+		],
+		"reverse": false,
+		"scrollbar_highlights": true,
+		"show_context": true,
+		"use_buffer2": true,
+		"use_gitignore": true,
+		"whole_word": false,
+		"wrap": true
+	},
+	"groups":
+	[
+		{
+			"sheets":
+			[
+			]
+		}
+	],
+	"incremental_find":
+	{
+		"height": 0.0
+	},
+	"input":
+	{
+		"height": 40.0
+	},
+	"layout":
+	{
+		"cells":
+		[
+			[
+				0,
+				0,
+				1,
+				1
+			]
+		],
+		"cols":
+		[
+			0.0,
+			1.0
+		],
+		"rows":
+		[
+			0.0,
+			1.0
+		]
+	},
+	"menu_visible": true,
+	"output.find_results":
+	{
+		"height": 0.0
+	},
+	"pinned_build_system": "",
+	"project": "app.sublime-project",
+	"replace":
+	{
+		"height": 0.0
+	},
+	"save_all_on_build": true,
+	"select_file":
+	{
+		"height": 0.0,
+		"last_filter": "",
+		"selected_items":
+		[
+		],
+		"width": 0.0
+	},
+	"select_project":
+	{
+		"height": 500.0,
+		"last_filter": "",
+		"selected_items":
+		[
+		],
+		"width": 380.0
+	},
+	"select_symbol":
+	{
+		"height": 0.0,
+		"last_filter": "",
+		"selected_items":
+		[
+		],
+		"width": 0.0
+	},
+	"selected_group": 0,
+	"settings":
+	{
+	},
+	"show_minimap": true,
+	"show_open_files": true,
+	"show_tabs": true,
+	"side_bar_visible": true,
+	"side_bar_width": 147.0,
+	"status_bar_visible": true,
+	"template_settings":
+	{
+	}
+}

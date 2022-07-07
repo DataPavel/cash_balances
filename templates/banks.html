@@ -1,0 +1,61 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<h1>Bank Accounts</h1>
+<br/>
+<div class="shadow p-3 mb-5 bg-body rounded">
+<form method='POST'>
+	{{  form.hidden_tag() }}
+
+	{{ form.company_name.label(class="form-label") }}
+	{{ form.company_name(class="form-control ") }}
+	<br/>
+	{{ form.bank_name.label(class="form-label") }}
+	{{ form.bank_name(class="form-control", placeholder="Enter Bank Name") }}
+	<br/>
+	{{ form.account_number.label(class="form-label") }}
+	{{ form.account_number(class="form-control", placeholder="Enter Account Number or IBAN") }}
+	<br/>
+	{{ form.currency.label(class="form-label") }}
+	{{ form.currency(class="form-control") }}
+	<br/>
+	{{ form.address.label(class="form-label") }}
+	{{ form.address(class="form-control", placeholder="Enter Address") }}
+	<br/>
+	{{ form.submit(class="btn btn-secondary") }}
+</form>
+</div>
+<br/><br/><br/>
+<table class="table table-hover table-bordered table-striped">
+	<thead class="table-success">
+  	<tr>
+	<td><h6>id</h6></td>
+	<td><h6>Company name</h6></td> 
+	<td><h6>Bank name</h6></td>
+	<td><h6>Account number</h6></td> 
+	<td><h6>Currency</h6></td> 
+	<td><h6>Address</h6></td>
+	<td><h6>Delete row</h6></td>
+	</tr>
+	</thead>
+{% for our_bank in our_banks %}
+	<tr>
+	<td><a href="{{ url_for('update', id=our_bank.id)}}">{{ our_bank.id }}</a></td>
+	<td>{{ our_bank.company_name }}</td> 
+	<td>{{ our_bank.bank_name }}</td>
+	<td>{{ our_bank.account_number }}</td> 
+	<td>{{ our_bank.currency }}</td> 
+	<td>{{ our_bank.address }}</td>
+	<td><a href="{{ url_for('delete', id=our_bank.id)}}">Delete</a></td>
+	</tr>
+
+{% endfor %}
+</table>
+<br/>
+<br/>
+<br/>
+
+
+
+{% endblock %}
