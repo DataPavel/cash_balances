@@ -248,7 +248,7 @@ def baldelete(id):
 
 
 # Create Filter page
-@app.route('/', methods = ['GET', 'POST'])
+@app.route('/filter/', methods = ['GET', 'POST'])
 def filter():
 	form=FilterForm()
 	form.company_name.choices=['All']+ company_balance_choices(bank_balances_uri)
@@ -455,6 +455,10 @@ def currency_del(id):
 	except:
 		flash('There was a problem deleting a currency')
 		return redirect(url_for('currency'))	
+
+@app.route('/')
+def index():
+	return render_template('index.html')
 
 @app.route('/test/')
 def test():
