@@ -94,8 +94,8 @@ def banks():
 @app.route('/update/<int:id>', methods = ['GET', 'POST'])
 def update(id):
 	form = BankForm()
-	form.company_name.choices=['Select Company']+ company_choices(companies_uri)
-	form.currency.choices=['Select Currency']+ currency_choices(currencies_uri) 
+	form.company_name.choices=['Select Company']+ company_choices(bank_balances_uri)
+	form.currency.choices=['Select Currency']+ currency_choices(bank_balances_uri) 
 	bank_to_update = Banks.query.get_or_404(id)
 	if request.method == 'POST':
 		bank_to_update.company_name = request.form['company_name']
