@@ -262,7 +262,7 @@ def filter():
 			fig = line_balances(bank_balances_uri)
 			graph=json.dumps(fig, cls=plotly.utils.PlotlyJSONEncoder)
 			fig2 = pie_currency(bank_balances_uri, date="'"+str(date)+"'", 
-				company_name = str(tuple(company_balance_choices(banks_uri))).replace(",)",")"))
+				company_name = str(tuple(company_balance_choices(bank_balances_uri))).replace(",)",")"))
 			graph2=json.dumps(fig2, cls=plotly.utils.PlotlyJSONEncoder)
 			fig3 = stack_bar(bank_balances_uri)
 			graph3=json.dumps(fig3, cls=plotly.utils.PlotlyJSONEncoder)
@@ -275,7 +275,7 @@ def filter():
 			fig = line_balances(bank_balances_uri)
 			graph=json.dumps(fig, cls=plotly.utils.PlotlyJSONEncoder)
 			fig2 = pie_currency(bank_balances_uri, date="'"+str(date)+"'", 
-				company_name = str(tuple(company_balance_choices(banks_uri))).replace(",)",")"))
+				company_name = str(tuple(company_balance_choices(bank_balances_uri))).replace(",)",")"))
 			graph2=json.dumps(fig2, cls=plotly.utils.PlotlyJSONEncoder)
 			fig3 = stack_bar(bank_balances_uri)
 			graph3=json.dumps(fig3, cls=plotly.utils.PlotlyJSONEncoder)

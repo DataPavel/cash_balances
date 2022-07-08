@@ -10,6 +10,7 @@ def company_choices(database_uri):
     ORDER BY 1
 
     """, con=engine)
+    engine.dispose()
     company_choices = data['company_name'].tolist()
     
     return company_choices
@@ -24,6 +25,7 @@ def currency_choices(database_uri):
     ORDER BY 1
 
     """, con=engine)
+    engine.dispose()
     currency_choices = data['currency'].tolist()
     
     return currency_choices
@@ -38,6 +40,7 @@ def company_balance_choices(database_uri):
     ORDER BY 1
 
     """, con=engine)
+    engine.dispose()
     company_balance_choices = data['company_name'].tolist()
     
     return company_balance_choices
@@ -51,6 +54,7 @@ def currency_balance_choices(database_uri):
     ORDER BY 1
 
     """, con=engine)
+    engine.dispose()
     currency_balance_choices = data['currency'].tolist()
     
     return currency_balance_choices
@@ -65,6 +69,7 @@ def sum_balance(database_uri, date):
     ORDER BY 1
 
     """.format(date), con=engine)
+    engine.dispose()
     sum_balance = data['sum'][0]
     if sum_balance == None:
         return None
