@@ -11,7 +11,8 @@ from plots import line_balances, pie_currency, stack_bar, extract_rates
 from queries import company_choices, currency_choices,\
 company_balance_choices, currency_balance_choices, sum_balance
 
-from forms import BankForm, BalanceForm, FilterForm, CompanyForm, CurrencyForm
+from forms import BankForm, BalanceForm, FilterForm, CompanyForm, \
+CurrencyForm, BankFormUpdate, BalanceFormUpdate
 
 # Decimal format for Jinja2
 def FormatDecimal(value):
@@ -93,9 +94,9 @@ def banks():
 # Update Banks Database
 @app.route('/update/<int:id>', methods = ['GET', 'POST'])
 def update(id):
-	form = BankForm()
-	form.company_name.choices=['Select Company']+ company_choices(bank_balances_uri)
-	form.currency.choices=['Select Currency']+ currency_choices(bank_balances_uri) 
+	form = BankFormUpdate()
+	#form.company_name.choices=['Select Company']+ company_choices(bank_balances_uri)
+	#form.currency.choices=['Select Currency']+ currency_choices(bank_balances_uri) 
 	bank_to_update = Banks.query.get_or_404(id)
 	if request.method == 'POST':
 		bank_to_update.company_name = request.form['company_name']
@@ -227,6 +228,33 @@ def bank_currency(bank):
 		currencyArray.append(currencyObj)
 
 	return jsonify({'currencies': currencyArray})
+
+# Update Balances Database
+@app.route('/update_bal/<int:id>', methods = ['GET', 'POST'])
+def update_bal(id):
+	form = BalanceFormUpdate()
+	balances_to_update = Balances.query.get_or_404(id)
+	if request.method == 'POST':
+		balances_to_update.company_name = request.form['company_name']
+		balances_to_update.bank_name = request.form['bank_name']
+		balances_to_update.currency = request.form['currency']
+		balances_to_update.balance_curr = request.form['balance_curr']
+		try:
+			db.session.commit()
+			flash('Record Updated Successfully')
+			return render_template('update_bal.html', form=form,
+				balances_to_update=balances_to_update, id=id)
+		except:
+			flash('Error!! Looks like there was a problem')
+			return render_template('update_bal.html', form=form,
+				balances_to_update=balances_to_update, id=id)
+	else:
+		return render_template('update_bal.html', form=form,
+				balances_to_update=balances_to_update, id=id)
+
+
+
+
 
 # Delete Balances from Database
 @app.route('/delbalance/<int:id>', methods = ['GET', 'POST'])
@@ -459,6 +487,10 @@ def currency_del(id):
 @app.route('/')
 def index():
 	return render_template('index.html')
+
+@app.route('/instructions/')
+def instructions():
+	return render_template('instructions.html')
 
 @app.route('/test/')
 def test():

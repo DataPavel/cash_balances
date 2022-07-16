@@ -30,15 +30,15 @@
 <table class="table table-hover table-bordered table-striped">
 	<thead class="table-success">
   	<tr>
-	<td align="center"><h6>id</h6></td>
-	<td align="center"><h6>Date</h6></td>
-	<td align="center"><h6>Company name</h6></td> 
-	<td align="center"><h6>Bank name</h6></td>
-	<td align="center"><h6>Currency</h6></td> 
-	<td align="center"><h6>Balance Currency</h6></td>
-	<td align="center"><h6>Rate</h6></td> 
-	<td align="center"><h6>Balance USD</h6></td>
-	<td align="center"><h6>Action</h6></td>
+	<td><h6>id</h6></td>
+	<td><h6>Date</h6></td>
+	<td><h6>Company name</h6></td> 
+	<td><h6>Bank name</h6></td>
+	<td><h6>Currency</h6></td> 
+	<td><h6>Balance Currency</h6></td>
+	<td><h6>Rate</h6></td> 
+	<td><h6>Balance USD</h6></td>
+	<td><h6>Delete row</h6></td>
 	</tr>
 	</thead>
 {% for our_balance in our_balances %}
@@ -59,7 +59,6 @@
 	</td>
 	<td>
 	<a href="{{ url_for('baldelete', id=our_balance.id)}}">Delete</a>
-	<a href="{{ url_for('update_bal', id=our_balance.id)}}">Update</a>
 	</td>
 	</tr>
 
@@ -78,28 +77,14 @@
 
 		fetch('/banks/' + company).then(function(response) {
 			response.json().then(function(data) {
-				// get unique values
-				var lookup = {};
-				var items = data.banks;
-				var result = [];
-
-				for (var item, i = 0; item = items[i++];) {
-				  var name = item.bank_name;
-
-				  if (!(name in lookup)) {
-				    lookup[name] = 1;
-				    result.push(name);
-				  }
-				}
-				
 
 				let optionHTML = '<option value="Select Bank">Select Bank</option>'
 
 
-				for (let bank_unique of result){ 
+				for (let bank of data.banks){ 
 				
 				
-					optionHTML+= '<option value="' + bank_unique + '">' + bank_unique +'</option>';		
+					optionHTML+= '<option value="' + bank.bank_name + '">' + bank.bank_name +'</option>';		
 				}
 				bank_select.innerHTML = optionHTML;
 			});
@@ -116,24 +101,11 @@
 	
 		fetch('/bank_cur/' + bank_change).then(function(response) {
 			response.json().then(function(data) {
-				// get unique values
-				var lookup = {};
-				var items = data.currencies;
-				var result = [];
-
-				for (var item, i = 0; item = items[i++];) {
-				  var name = item.currency;
-
-				  if (!(name in lookup)) {
-				    lookup[name] = 1;
-				    result.push(name);
-				  }
-				}
 				
 				let optionHTML = '<option value="Select Currency">Select Currency</option>';
 
-				for (let currency_unique of result) {
-					optionHTML+= '<option value="' + currency_unique + '">' + currency_unique +'</option>';		
+				for (let currency of data.currencies) {
+					optionHTML+= '<option value="' + currency.currency + '">' + currency.currency +'</option>';		
 				}
 				currency_select.innerHTML = optionHTML;
 			});

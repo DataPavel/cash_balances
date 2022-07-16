@@ -17,6 +17,17 @@ class BankForm(FlaskForm):
 	address = StringField('Address', validators=[DataRequired()])
 	submit = SubmitField('Submit')
 
+# Create a Form Class
+class BankFormUpdate(FlaskForm):
+	company_name = StringField('Company Name', 
+		validators=[DataRequired()])
+	bank_name = StringField('Bank Name', validators=[DataRequired()])
+	account_number = StringField('Account Number', validators=[DataRequired()])
+	currency = StringField('Currency', 
+		validators=[DataRequired()])
+	address = StringField('Address', validators=[DataRequired()])
+	submit = SubmitField('Submit')
+
 
 	# Create a Form Class
 class BalanceForm(FlaskForm):
@@ -28,6 +39,21 @@ class BalanceForm(FlaskForm):
 		validators=[DataRequired()], validate_choice=True)
 	currency = SelectField('Currency', choices=[],
 		validators=[DataRequired()], validate_choice=True)
+	balance_curr = DecimalField('Balance', validators=[DataRequired()],
+		number_format='# ###,##')
+	submit = SubmitField('Submit')
+
+
+	# Create a Form Class
+class BalanceFormUpdate(FlaskForm):
+	
+	date = DateField('Date', validators=[DataRequired()])
+	company_name = StringField('Company Name', 
+		validators=[DataRequired()])
+	bank_name = StringField('Bank Name',
+		validators=[DataRequired()])
+	currency = StringField('Currency',
+		validators=[DataRequired()])
 	balance_curr = DecimalField('Balance', validators=[DataRequired()],
 		number_format='# ###,##')
 	submit = SubmitField('Submit')
