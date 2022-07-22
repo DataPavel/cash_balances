@@ -7,6 +7,7 @@ import plotly
 import json
 import requests
 import jinja2
+import os
 from plots import line_balances, pie_currency, stack_bar, extract_rates
 from queries import company_choices, currency_choices,\
 company_balance_choices, currency_balance_choices, sum_balance
@@ -22,21 +23,10 @@ jinja2.filters.FILTERS['FormatDecimal'] = FormatDecimal
 
 # Create a Flask Instance
 app = Flask(__name__)
-# Add Database sqlite
-#app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///banks.db'
-# Add Potgres Database
 
+bank_balances_uri = os.environ.get('database')
 
-bank_balances_uri = 'postgresql://pmexsbdwmokrmy:a6568409da913377486746382a52d559b42de43bceb574644d56a9b3855d2d9f@ec2-54-159-22-90.compute-1.amazonaws.com:5432/ddo72dnumoua06'
-#bank_balances_uri = 'postgresql://pavel:1234@localhost/bank_balances'
-#banks_uri = 'postgresql://pavel:1234@localhost/banks'
-#balances_uri = 'postgresql://pavel:1234@localhost/balances'
-#fx_uri = 'postgresql://pavel:1234@localhost/forex'
-#companies_uri = 'postgresql://pavel:1234@localhost/companies'
-#currencies_uri = 'postgresql://pavel:1234@localhost/currencies'
 app.config['SQLALCHEMY_DATABASE_URI'] = bank_balances_uri
-#app.config['SQLALCHEMY_BINDS'] = {'balance': balances_uri, 
-#'fx': fx_uri, 'companies': companies_uri, 'currencies': currencies_uri}
 
 # Create a Sectet Key
 app.config['SECRET_KEY'] = 'KEY'
@@ -166,8 +156,7 @@ class Balances(db.Model):
 		return '<Name %r>' % self.date
 
 
-
-
+SECRET_KEY = os.environ.get('secret')
 
 
 
@@ -183,7 +172,7 @@ def balances():
 		currency = request.form['currency']
 		date_exists = forex.query.filter_by(date=form.date.data).first()
 		if date_exists is None:
-			URL = 'https://openexchangerates.org/api/historical/{}.json?app_id=0590af3cd75444c185bece0bba2dbc74'.format(date)
+			URL = 'https://openexchangerates.org/api/historical/{}.json?app_id={}'.format(date, SECRET_KEY)
 			response = requests.get(URL)
 			display = response.json()['rates']
 			fxes = forex(request.form['date'], 'USD', display)
