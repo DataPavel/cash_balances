@@ -8,12 +8,27 @@ import json
 import requests
 import jinja2
 import os
+from dotenv import load_dotenv
 from plots import line_balances, pie_currency, stack_bar, extract_rates
 from queries import company_choices, currency_choices,\
 company_balance_choices, currency_balance_choices, sum_balance
 
 from forms import BankForm, BalanceForm, FilterForm, CompanyForm, \
 CurrencyForm, BankFormUpdate, BalanceFormUpdate
+
+
+def configure():
+    load_dotenv()
+
+configure()
+
+def cleanup(session):
+    """
+    This method cleans up the session object and closes the connection pool using the dispose 
+    method.
+    """
+    session.close()
+    engine_container.dispose()
 
 # Decimal format for Jinja2
 def FormatDecimal(value):
@@ -32,7 +47,11 @@ app.config['SQLALCHEMY_DATABASE_URI'] = bank_balances_uri
 app.config['SECRET_KEY'] = 'KEY'
 
 #Initialize the Database
-db = SQLAlchemy(app)
+db = SQLAlchemy()
+db.app = app
+db.init_app(app)
+engine_container = db.get_engine(app)
+#db = SQLAlchemy(app)
 
 # Create Model for database
 class Banks(db.Model):
@@ -171,6 +190,7 @@ def balances():
 		date=request.form['date']
 		currency = request.form['currency']
 		date_exists = forex.query.filter_by(date=form.date.data).first()
+		cleanup(db.session)
 		if date_exists is None:
 			URL = 'https://openexchangerates.org/api/historical/{}.json?app_id={}'.format(date, SECRET_KEY)
 			response = requests.get(URL)
@@ -178,11 +198,13 @@ def balances():
 			fxes = forex(request.form['date'], 'USD', display)
 			db.session.add(fxes)
 			db.session.commit()
+			db.session.close()
 		rate = extract_rates(bank_balances_uri, currency, date).astype(float)
 		balances = Balances(request.form['date'], request.form['company_name'], 
 			request.form['bank_name'], request.form['currency'], request.form['balance_curr'], rate, float(request.form['balance_curr']) / rate)
 		db.session.add(balances)
 		db.session.commit()
+		cleanup(db.session)
 		return redirect(url_for('balances'))
 	else:
 		#rate = ''
@@ -193,7 +215,7 @@ def balances():
 @app.route('/banks/<company>')
 def bank(company):
 	banks = Banks.query.filter_by(company_name=company).all()
-
+	cleanup(db.session)
 	bankArray = []
 
 	for bank in banks:
@@ -207,7 +229,7 @@ def bank(company):
 @app.route('/bank_cur/<bank>')
 def bank_currency(bank):
 	banks = Banks.query.filter_by(bank_name=bank).all()
-
+	cleanup(db.session)
 	currencyArray = []
 
 	for bank in banks:
@@ -230,6 +252,7 @@ def update_bal(id):
 		balances_to_update.balance_curr = request.form['balance_curr']
 		try:
 			db.session.commit()
+			cleanup(db.session)
 			flash('Record Updated Successfully')
 			return render_template('update_bal.html', form=form,
 				balances_to_update=balances_to_update, id=id)
@@ -250,10 +273,11 @@ def update_bal(id):
 def baldelete(id):
 	form = BalanceForm()
 	balance_to_delete = Balances.query.get_or_404(id)
-	
+	cleanup(db.session)
 	try:
 		db.session.delete(balance_to_delete)
 		db.session.commit()
+		cleanup(db.session)
 		our_balances = Balances.query.order_by(Balances.date.desc())
 		flash('User Deleted Successfully')
 		return redirect(url_for('balances'))
@@ -267,82 +291,91 @@ def baldelete(id):
 # Create Filter page
 @app.route('/filter/', methods = ['GET', 'POST'])
 def filter():
-	form=FilterForm()
-	form.company_name.choices=['All']+ company_balance_choices(bank_balances_uri)
-	form.currency.choices=['All']+ currency_balance_choices(bank_balances_uri)
-	if request.method == 'POST':
-		company_name = form.company_name.data
-		currency = form.currency.data
-		date = form.date.data
-		if company_name[0] == 'All' and currency[0] == 'All':
-			our_balances = Balances.query.filter(Balances.date==date).order_by(Balances.date.desc())
-			fig = line_balances(bank_balances_uri)
-			graph=json.dumps(fig, cls=plotly.utils.PlotlyJSONEncoder)
-			fig2 = pie_currency(bank_balances_uri, date="'"+str(date)+"'", 
-				company_name = str(tuple(company_balance_choices(bank_balances_uri))).replace(",)",")"))
-			graph2=json.dumps(fig2, cls=plotly.utils.PlotlyJSONEncoder)
-			fig3 = stack_bar(bank_balances_uri)
-			graph3=json.dumps(fig3, cls=plotly.utils.PlotlyJSONEncoder)
-			sum_bal = sum_balance(bank_balances_uri, date="'"+str(date)+"'")
+	if Balances.query.all() == []:
 
-			return render_template('filter.html', graph=graph, graph2=graph2, 
-				graph3=graph3, our_balances=our_balances, form=form, date=date, sum_bal=sum_bal)
-		elif company_name[0] == 'All' and currency[0] != 'All':
-			our_balances = Balances.query.filter(Balances.currency.in_(currency)).filter_by(date=date).order_by(Balances.date.desc())
-			fig = line_balances(bank_balances_uri)
-			graph=json.dumps(fig, cls=plotly.utils.PlotlyJSONEncoder)
-			fig2 = pie_currency(bank_balances_uri, date="'"+str(date)+"'", 
-				company_name = str(tuple(company_balance_choices(bank_balances_uri))).replace(",)",")"))
-			graph2=json.dumps(fig2, cls=plotly.utils.PlotlyJSONEncoder)
-			fig3 = stack_bar(bank_balances_uri)
-			graph3=json.dumps(fig3, cls=plotly.utils.PlotlyJSONEncoder)
-			sum_bal = sum_balance(bank_balances_uri, date="'"+str(date)+"'")
-
-			return render_template('filter.html', graph=graph, graph2=graph2, 
-				graph3=graph3, our_balances=our_balances, form=form, date=date, sum_bal=sum_bal)
-		elif company_name[0] != 'All' and currency[0] == 'All':
-			our_balances = Balances.query.filter(Balances.company_name.in_(company_name)).filter_by(date=date).order_by(Balances.date.desc())
-			fig = line_balances(bank_balances_uri)
-			graph=json.dumps(fig, cls=plotly.utils.PlotlyJSONEncoder)
-			fig2 = pie_currency(bank_balances_uri, date="'"+str(date)+"'", 
-				company_name = str(tuple(company_name)).replace(",)",")"))
-			graph2=json.dumps(fig2, cls=plotly.utils.PlotlyJSONEncoder)
-			fig3 = stack_bar(bank_balances_uri)
-			graph3=json.dumps(fig3, cls=plotly.utils.PlotlyJSONEncoder)
-			sum_bal = sum_balance(bank_balances_uri, date="'"+str(date)+"'")
-
-			return render_template('filter.html', graph=graph, graph2=graph2, 
-				graph3=graph3, our_balances=our_balances, form=form, date=date, sum_bal=sum_bal)		
-		
-		else:
-			our_balances = Balances.query.filter(Balances.company_name.in_(company_name),
-				Balances.currency.in_(currency)).filter_by(date=date).order_by(Balances.date.desc())
-			fig = line_balances(bank_balances_uri)
-			graph=json.dumps(fig, cls=plotly.utils.PlotlyJSONEncoder)
-			fig2 = pie_currency(bank_balances_uri, date="'"+str(date)+"'", 
-				company_name = str(tuple(company_name)).replace(",)",")"))
-			graph2=json.dumps(fig2, cls=plotly.utils.PlotlyJSONEncoder)
-			fig3 = stack_bar(bank_balances_uri)
-			graph3=json.dumps(fig3, cls=plotly.utils.PlotlyJSONEncoder)
-			sum_bal = sum_balance(bank_balances_uri, date="'"+str(date)+"'")
-
-			return render_template('filter.html', graph=graph, graph2=graph2, 
-				graph3=graph3, our_balances=our_balances, form=form, date=date, sum_bal=sum_bal)
-
+		return render_template('fillout.html')
 	else:
-		fig = line_balances(bank_balances_uri)
-		graph=json.dumps(fig, cls=plotly.utils.PlotlyJSONEncoder)
-		fig2 = pie_currency(bank_balances_uri, date="'"+str(Balances.query.order_by(Balances.date.desc()).first().date)+"'", 
-				company_name = str(tuple(company_balance_choices(bank_balances_uri))).replace(",)",")"))
-		graph2=json.dumps(fig2, cls=plotly.utils.PlotlyJSONEncoder)
-		our_balances = Balances.query.order_by(Balances.date.desc())
-		fig3 = stack_bar(bank_balances_uri)
-		graph3=json.dumps(fig3, cls=plotly.utils.PlotlyJSONEncoder)
-		date = Balances.query.order_by(Balances.date.desc()).first().date
-		sum_bal = sum_balance(bank_balances_uri, date="'"+str(Balances.query.order_by(Balances.date.desc()).first().date)+"'")
+		form=FilterForm()
+		form.company_name.choices=['All']+ company_balance_choices(bank_balances_uri)
+		form.currency.choices=['All']+ currency_balance_choices(bank_balances_uri)
+		if request.method == 'POST':
+			company_name = form.company_name.data
+			currency = form.currency.data
+			date = form.date.data
+			if company_name[0] == 'All' and currency[0] == 'All':
+				our_balances = Balances.query.filter(Balances.date==date).order_by(Balances.date.desc())
+				cleanup(db.session)
+				fig = line_balances(bank_balances_uri)
+				graph=json.dumps(fig, cls=plotly.utils.PlotlyJSONEncoder)
+				fig2 = pie_currency(bank_balances_uri, date="'"+str(date)+"'", 
+					company_name = str(tuple(company_balance_choices(bank_balances_uri))).replace(",)",")"))
+				graph2=json.dumps(fig2, cls=plotly.utils.PlotlyJSONEncoder)
+				fig3 = stack_bar(bank_balances_uri)
+				graph3=json.dumps(fig3, cls=plotly.utils.PlotlyJSONEncoder)
+				sum_bal = sum_balance(bank_balances_uri, date="'"+str(date)+"'")
 
-		return render_template('filter.html', graph=graph, graph2=graph2, 
-			graph3=graph3, our_balances=our_balances, form=form, date=date, sum_bal=sum_bal)
+				return render_template('filter.html', graph=graph, graph2=graph2, 
+					graph3=graph3, our_balances=our_balances, form=form, date=date, sum_bal=sum_bal)
+			elif company_name[0] == 'All' and currency[0] != 'All':
+				our_balances = Balances.query.filter(Balances.currency.in_(currency)).filter_by(date=date).order_by(Balances.date.desc())
+				cleanup(db.session)
+				fig = line_balances(bank_balances_uri)
+				graph=json.dumps(fig, cls=plotly.utils.PlotlyJSONEncoder)
+				fig2 = pie_currency(bank_balances_uri, date="'"+str(date)+"'", 
+					company_name = str(tuple(company_balance_choices(bank_balances_uri))).replace(",)",")"))
+				graph2=json.dumps(fig2, cls=plotly.utils.PlotlyJSONEncoder)
+				fig3 = stack_bar(bank_balances_uri)
+				graph3=json.dumps(fig3, cls=plotly.utils.PlotlyJSONEncoder)
+				sum_bal = sum_balance(bank_balances_uri, date="'"+str(date)+"'")
+
+				return render_template('filter.html', graph=graph, graph2=graph2, 
+					graph3=graph3, our_balances=our_balances, form=form, date=date, sum_bal=sum_bal)
+			elif company_name[0] != 'All' and currency[0] == 'All':
+				our_balances = Balances.query.filter(Balances.company_name.in_(company_name)).filter_by(date=date).order_by(Balances.date.desc())
+				cleanup(db.session)
+				fig = line_balances(bank_balances_uri)
+				graph=json.dumps(fig, cls=plotly.utils.PlotlyJSONEncoder)
+				fig2 = pie_currency(bank_balances_uri, date="'"+str(date)+"'", 
+					company_name = str(tuple(company_name)).replace(",)",")"))
+				graph2=json.dumps(fig2, cls=plotly.utils.PlotlyJSONEncoder)
+				fig3 = stack_bar(bank_balances_uri)
+				graph3=json.dumps(fig3, cls=plotly.utils.PlotlyJSONEncoder)
+				sum_bal = sum_balance(bank_balances_uri, date="'"+str(date)+"'")
+
+				return render_template('filter.html', graph=graph, graph2=graph2, 
+					graph3=graph3, our_balances=our_balances, form=form, date=date, sum_bal=sum_bal)		
+			
+			else:
+				our_balances = Balances.query.filter(Balances.company_name.in_(company_name),
+					Balances.currency.in_(currency)).filter_by(date=date).order_by(Balances.date.desc())
+				cleanup(db.session)
+				fig = line_balances(bank_balances_uri)
+				graph=json.dumps(fig, cls=plotly.utils.PlotlyJSONEncoder)
+				fig2 = pie_currency(bank_balances_uri, date="'"+str(date)+"'", 
+					company_name = str(tuple(company_name)).replace(",)",")"))
+				graph2=json.dumps(fig2, cls=plotly.utils.PlotlyJSONEncoder)
+				fig3 = stack_bar(bank_balances_uri)
+				graph3=json.dumps(fig3, cls=plotly.utils.PlotlyJSONEncoder)
+				sum_bal = sum_balance(bank_balances_uri, date="'"+str(date)+"'")
+
+				return render_template('filter.html', graph=graph, graph2=graph2, 
+					graph3=graph3, our_balances=our_balances, form=form, date=date, sum_bal=sum_bal)
+
+		else:
+			fig = line_balances(bank_balances_uri)
+			graph=json.dumps(fig, cls=plotly.utils.PlotlyJSONEncoder)
+			fig2 = pie_currency(bank_balances_uri, date="'"+str(Balances.query.order_by(Balances.date.desc()).first().date)+"'", 
+					company_name = str(tuple(company_balance_choices(bank_balances_uri))).replace(",)",")"))
+			graph2=json.dumps(fig2, cls=plotly.utils.PlotlyJSONEncoder)
+			our_balances = Balances.query.order_by(Balances.date.desc())
+			cleanup(db.session)
+			fig3 = stack_bar(bank_balances_uri)
+			graph3=json.dumps(fig3, cls=plotly.utils.PlotlyJSONEncoder)
+			date = Balances.query.order_by(Balances.date.desc()).first().date
+			sum_bal = sum_balance(bank_balances_uri, date="'"+str(Balances.query.order_by(Balances.date.desc()).first().date)+"'")
+
+			return render_template('filter.html', graph=graph, graph2=graph2, 
+				graph3=graph3, our_balances=our_balances, form=form, date=date, sum_bal=sum_bal)
 
 
 
@@ -483,4 +516,8 @@ def instructions():
 
 @app.route('/test/')
 def test():
-	return render_template('test.html')
+	if Balances.query.all() == []:
+		return render_template('test.html', df='her')
+	else:
+
+		return render_template('test.html', df=Balances.query.all())
